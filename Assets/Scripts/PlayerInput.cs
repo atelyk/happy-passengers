@@ -2,22 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInput  {
+public class PlayerInput {
 
-    private Dictionary<KeyCode, PlayerCommand> keyboardLayaut;
+    private Dictionary<KeyCode, PlayerCommand> keyboardLayout;
 
-    public PlayerInput(Player player)
+    public PlayerInput(PlayerModel playerModel)
     {
-        keyboardLayaut = new Dictionary<KeyCode, PlayerCommand>
+        keyboardLayout = new Dictionary<KeyCode, PlayerCommand>
         {
-            { KeyCode.LeftArrow, new MoveLeft(player) },
-            { KeyCode.RightArrow, new MoveRight(player) }
+            { KeyCode.LeftArrow, new MoveLeft(playerModel) },
+            { KeyCode.RightArrow, new MoveRight(playerModel) },
+            { KeyCode.A, new MoveLeft(playerModel) },
+            { KeyCode.D, new MoveRight(playerModel) }
         };
     }
 	
 	public void Update () {
         // Keyboard reading
-        foreach (var keyRecord in keyboardLayaut)
+        foreach (var keyRecord in keyboardLayout)
         {
             if (Input.GetKeyDown(keyRecord.Key))
             {

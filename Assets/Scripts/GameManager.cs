@@ -1,13 +1,25 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+using Image = UnityEngine.Experimental.UIElements.Image;
 
 public class GameManager : MonoBehaviour {
     [SerializeField]
-    private float speed = 1f;
-
+    private float gameSpeed = 1f;
     [SerializeField]
     private float speadIncrease = 0.01f;
+    [SerializeField]
+    private float timeToSpeadIncrease = 1.0f;
+    [SerializeField]
+    private PlayerMonoBehaviour playerMonoBehaviour;
+    [SerializeField]
+    private Text uiHappinessText;
+    [SerializeField]
+    private Text uiTimeText;
+    [SerializeField]
+    private GameObject uiDirection;
 
-    public float Speed { get { return speed; } }
+    public float GameSpeed { get { return gameSpeed; } }
 
     public enum State
     {
@@ -16,7 +28,6 @@ public class GameManager : MonoBehaviour {
         PlayerActive,
         GameOver
     }
-    private static GameManager _instance;
 
     public static GameManager Instance
     {
@@ -30,7 +41,14 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    private Player player;
+    private static GameManager _instance;
+
+    private const int speadModificator = 2;
+
+    private float speadIncreaseLastUpdate = 0;
+    private GameObject destinationObj;
+    private RectTransform directionTransform;
+    private UiManager uiManager;
 
     private void Awake()
     {
@@ -46,13 +64,62 @@ public class GameManager : MonoBehaviour {
         DontDestroyOnLoad(gameObject);
     }
 
-    // Use this for initialization
-    void Start () {
-        player = FindObjectOfType<Player>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    private void Start()
+    {
+        playerMonoBehaviour = playerMonoBehaviour ?? GameObject.FindObjectOfType<PlayerMonoBehaviour>();
+        // TODO
+        Vector3 destinationPosition = FindDestinationPoint();
+        directionTransform = uiDirection.transform as RectTransform;
+        uiManager = new UiManager(playerMonoBehaviour.PlayerModel, destinationPosition, directionTransform, uiTimeText, uiHappinessText);
+    }
+
+    private void OnGUI()
+    {
+        uiManager.OnGUI();
+    }
+
+    public void SlowDownGameSpeed()// get in obstacle
+    {
+        gameSpeed /= speadModificator;
+        speadIncrease /= speadModificator;
+    }
+
+    public void IncreaseGameSpeed()
+    {
+        gameSpeed *= speadModificator;
+        speadIncrease *= speadModificator;
+    }
+
+    public void GameOver()
+    {
+        print("Game Over");
+        Time.timeScale = 0;
+    }
+
+    private void Update()
+    {
+        // Speed changes
+        speadIncreaseLastUpdate += Time.deltaTime;
+        if (speadIncreaseLastUpdate >= timeToSpeadIncrease)
+        {
+            gameSpeed += speadIncrease;
+            speadIncreaseLastUpdate = 0;
+        }
+
+        // Moving objects
+        destinationObj.transform.Translate(0, -(gameSpeed * Time.deltaTime), 0);
+    }
+
+    private Vector3 FindDestinationPoint()
+    {
+        Vector3 dest = playerMonoBehaviour.transform.position + new Vector3(0, 100f, 0);
+        destinationObj = GameObject.FindGameObjectWithTag("Finish");
+        destinationObj.transform.position = destinationObj.transform.position + dest;
+        return destinationObj.transform.position;
+    }
+}
+
+public class DestinationObject
+{
+    public Vector3 Position { get; set; }
 }

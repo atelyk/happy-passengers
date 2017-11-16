@@ -2,32 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Obstacle : MonoBehaviour {
-    Transform transform;
+public abstract class Obstacle : MonoBehaviour
+{
+    //Position transform;
 
-	// Use this for initialization
-	void Start () {
-        transform = GetComponent<Transform>();
+    void Awake()
+    {
+        //transform = GetComponent<Position>();
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    void Update()
+    {
         Move();
-	}
+    }
 
     protected virtual void Move()
     {
-        transform.Translate(0, -(GameManager.Instance.Speed * Time.deltaTime), 0);
+        transform.Translate(0, -(GameManager.Instance.GameSpeed * Time.deltaTime), 0);
     }
 
-    void OnCollisionEnter2D(Collision2D coll)
-    {
-        if (coll.gameObject.tag == "Enemy")
-            coll.gameObject.SendMessage("ApplyDamage", 10);
-
-    }
-
-    void OnTriggerEnter2D(Collider2D coll)
+    protected virtual void OnTriggerEnter2D(Collider2D coll)
     {
         if (coll.gameObject.tag == "sceneCollider")
             ObstacleManager.Instance.MakeObjectFree(this.gameObject);

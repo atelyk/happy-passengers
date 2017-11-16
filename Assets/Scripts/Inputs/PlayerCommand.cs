@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class PlayerCommand: ICommand {
-    protected Player player;
+    protected PlayerModel playerModel;
 
-    public PlayerCommand(Player player)
+    public PlayerCommand(PlayerModel playerModel)
     {
-        this.player = player;
+        this.playerModel = playerModel;
     }
 
     public abstract void Execute();

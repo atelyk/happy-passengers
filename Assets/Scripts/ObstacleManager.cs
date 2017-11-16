@@ -92,8 +92,9 @@ public class ObstacleManager : MonoBehaviour {
             newObstacle.gameObject.transform.position = 
                 new Vector2(Random.Range(-stageDimensions.x, stageDimensions.x), stageDimensions.y);
             newObstacle.SetActive(true);
-            float nextCreationTimer = initialCreationTimer / GameManager.Instance.Speed;
+            float nextCreationTimer = initialCreationTimer / GameManager.Instance.GameSpeed;
             float variation = nextCreationTimer / initialCreationTimer;
+            // BUG: if wait is set while game is slow down and game spead increases - to big distances
             yield return new WaitForSecondsRealtime(nextCreationTimer + Random.Range(-variation, variation));
         }
     }

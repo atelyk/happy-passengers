@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class MoveRight : PlayerCommand
 {
-    public MoveRight(Player player) : base(player) { }
+    public MoveRight(PlayerModel playerModel) : base(playerModel) { }
 
     public override void Execute()
     {
-        player.ChangeDirection(Player.Direction.Right);
+        playerModel.ChangeDirection(PlayerModel.Direction.Right);
     }
 }
