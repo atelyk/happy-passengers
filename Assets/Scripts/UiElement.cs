@@ -1,11 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine.UI;
 
 public interface IUiElement
 {
-
+    void OnGUI();
 }
 
 public class UiTextElement: IUiElement {
@@ -21,5 +18,10 @@ public class UiTextElement: IUiElement {
     public void UpdateLabel(string changed)
     {
         textElement.text = label + changed;
+    }
+
+    public void OnGUI()
+    {
+        throw new System.NotImplementedException();
     }
 }

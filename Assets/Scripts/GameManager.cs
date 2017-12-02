@@ -1,7 +1,6 @@
-﻿using System.Collections;
+﻿using Assets.Scripts.UI;
 using UnityEngine;
 using UnityEngine.UI;
-using Image = UnityEngine.Experimental.UIElements.Image;
 
 public class GameManager : MonoBehaviour {
     [SerializeField]
@@ -70,8 +69,20 @@ public class GameManager : MonoBehaviour {
         // TODO
         Vector3 destinationPosition = FindDestinationPoint();
         directionTransform = uiDirection.transform as RectTransform;
-        uiManager = new UiManager(playerMonoBehaviour.PlayerModel, destinationPosition, directionTransform, uiTimeText, uiHappinessText);
+
+        var directionArrowUi = new UiDirectionArrow(
+            directionTransform,
+            destinationObj.transform,
+            //directionTransform.anchoredPosition + new Vector2(0, Screen.width), 
+            //Mathf.Asin((Screen.width * 0.8f) / diameter),
+            playerMonoBehaviour.PlayerModel,
+            Screen.width,
+            Screen.height / 7);
+        var textUiManager = new UiTextManager(playerMonoBehaviour.PlayerModel, uiTimeText, uiHappinessText);
+
+        uiManager = new UiManager(textUiManager, directionArrowUi);
     }
+
 
     private void OnGUI()
     {

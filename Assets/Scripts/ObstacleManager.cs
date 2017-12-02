@@ -44,8 +44,9 @@ public class ObstacleManager : MonoBehaviour {
     private List<GameObject> pool;
     private LinkedList<int> poolFreeIndexes;
 
-    // Use this for initialization
-    void Start () {
+    void Start ()
+    {
+        var generatedObjects = GameObject.Find("GeneratedObjects");
         pool = new List<GameObject>(poolCount);
         poolFreeIndexes = new LinkedList<int>();
         int part = poolCount / obstacles.Length;
@@ -56,7 +57,7 @@ public class ObstacleManager : MonoBehaviour {
             var partBorder = partMax >= poolCount ? poolCount : partMax;
             for (int j = i * part; j < partBorder; j++)
             {
-                var newObstacle = Instantiate<GameObject>(obstacles[i]);
+                var newObstacle = Instantiate<GameObject>(obstacles[i], generatedObjects.transform);
                 pool.Add(newObstacle);
                 poolFreeIndexes.AddLast(j);
             }
