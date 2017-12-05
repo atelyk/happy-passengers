@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using HappyPassengers.Scripts.Player;
+using UnityEngine;
 
-namespace Assets.Scripts.UI
+namespace HappyPassengers.Scripts.UI
 {
     internal class UiDirectionArrow : IUiElement
     {

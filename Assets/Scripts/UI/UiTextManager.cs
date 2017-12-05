@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using HappyPassengers.Scripts.Player;
+using UnityEngine;
 using UnityEngine.UI;
 
-namespace Assets.Scripts.UI
+namespace HappyPassengers.Scripts.UI
 {
     internal class UiTextManager : IUiElement
     {

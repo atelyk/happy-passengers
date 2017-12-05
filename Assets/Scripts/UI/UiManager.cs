@@ -1,4 +1,4 @@
-﻿namespace Assets.Scripts.UI
+﻿namespace HappyPassengers.Scripts.UI
 {
     internal class UiManager
     {

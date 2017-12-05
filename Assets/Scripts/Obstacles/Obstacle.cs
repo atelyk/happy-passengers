@@ -1,29 +1,33 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
-public abstract class Obstacle : MonoBehaviour
+namespace HappyPassengers.Scripts.Obstacles
 {
-    //Position transform;
-
-    void Awake()
+    public abstract class Obstacle : MonoBehaviour
     {
-        //transform = GetComponent<Position>();
-    }
+        public event Action<Obstacle> OnLeaveScene; 
+        //Position transform;
 
-    void Update()
-    {
-        Move();
-    }
+        void Awake()
+        {
+            //transform = GetComponent<Position>();
+            OnLeaveScene += o => { };
+        }
 
-    protected virtual void Move()
-    {
-        transform.Translate(0, -(GameManager.Instance.GameSpeed * Time.deltaTime), 0);
-    }
+        void Update()
+        {
+            Move();
+        }
 
-    protected virtual void OnTriggerEnter2D(Collider2D coll)
-    {
-        if (coll.gameObject.tag == "sceneCollider")
-            ObstacleManager.Instance.MakeObjectFree(this.gameObject);
+        protected virtual void Move()
+        {
+            transform.Translate(0, -(GameManager.Instance.GameSpeed * Time.deltaTime), 0);
+        }
+
+        protected virtual void OnTriggerEnter2D(Collider2D coll)
+        {
+            if (coll.gameObject.tag == "sceneCollider")
+                OnLeaveScene(this);
+        }
     }
 }

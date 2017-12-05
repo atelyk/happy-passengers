@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class AirPit : Obstacle
+﻿namespace HappyPassengers.Scripts.Obstacles
 {
+    public class AirPit : Obstacle
+    {
 
+    }
 }

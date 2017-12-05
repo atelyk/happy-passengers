@@ -1,4 +1,7 @@
-﻿public interface ICommand
+﻿namespace HappyPassengers.Scripts.Inputs
 {
-    void Execute();
+    public interface ICommand
+    {
+        void Execute();
+    }
 }

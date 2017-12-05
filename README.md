@@ -1,7 +1,7 @@
 # Happy passengers
 
 Hi there!
-This small and not so fun project is my sandbox for investiagation of Unity and Unity's project architecture.
+This small and not so fun project is my playground for investiagation of Unity and Unity's project architecture.
 So please fill free to be severe :)
 
 ## Getting Started

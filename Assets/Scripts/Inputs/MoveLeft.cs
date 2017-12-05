@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using HappyPassengers.Scripts.Player;
 
-public class MoveLeft : PlayerCommand {
+namespace HappyPassengers.Scripts.Inputs
+{
+    public class MoveLeft : PlayerCommand {
 
-    public MoveLeft(PlayerModel playerModel) : base(playerModel) { }
+        public MoveLeft(PlayerModel playerModel) : base(playerModel) { }
 
-    public override void Execute()
-    {
-        playerModel.ChangeDirection(PlayerModel.Direction.Left);
+        public override void Execute()
+        {
+            playerModel.ChangeDirection(PlayerModel.Direction.Left);
+        }
     }
 }
