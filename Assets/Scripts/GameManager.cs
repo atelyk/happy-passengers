@@ -36,6 +36,12 @@ namespace HappyPassengers.Scripts
         [SerializeField]
         private GameObject uiDirection;
 
+        [SerializeField]
+        private GameObject scorePanel;
+
+        [SerializeField]
+        private GameObject scorePrefab;
+
         public float GameSpeed { get { return gameSpeed; } }
 
         public static GameManager Instance
@@ -60,6 +66,7 @@ namespace HappyPassengers.Scripts
         private UiManager uiManager;
         private GameState gameState = GameState.Start;
         private ISaver saver;
+        private Text[] showedScores;
         public Scores scores;
 
         private void Awake()
@@ -97,6 +104,29 @@ namespace HappyPassengers.Scripts
 
             saver = new BinarySaver();
             scores = saver.Load<Scores>();
+            ShowScore();
+        }
+
+        private void ShowScore()
+        {
+            if (showedScores == null)
+            {
+                showedScores = new Text[scores.scoreSet.Length];
+                for (var i = 0; i < scores.scoreSet.Length; i++)
+                {
+                    showedScores[i] = Instantiate(scorePrefab, scorePanel.transform).GetComponent<Text>();
+                }
+            }
+
+            UpdateScores();
+        }
+
+        private void UpdateScores()
+        {
+            for (var i = 0; i < scores.scoreSet.Length; i++)
+            {
+                showedScores[i].text = (i + 1).ToString("D2") + ".    " + scores.scoreSet[i].ToString();
+            }
         }
 
 
@@ -146,6 +176,7 @@ namespace HappyPassengers.Scripts
                 }
                 scores.AddScore(new ScoreModel("New Name", playerMonoBehaviour.PlayerModel.Happiness));
                 saver.Save(scores);
+                ShowScore();
                 Time.timeScale = 0;
             }
         }

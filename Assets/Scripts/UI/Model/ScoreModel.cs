@@ -21,5 +21,10 @@ namespace HappyPassengers.Scripts.UI.Model
 
         public int Score;
         public string Name;
+
+        public override string ToString()
+        {
+            return $"{Score}    {Name}";
+        }
     }
 }
