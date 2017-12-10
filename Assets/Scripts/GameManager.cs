@@ -11,18 +11,22 @@ namespace HappyPassengers.Scripts
         Start,
         InGame,
         PlayerActive,
+        Pause,
         GameOver
     }
 
     public class GameManager : MonoBehaviour {
         [SerializeField]
-        private float gameSpeed = 1f;
+        private float initialGameSpeed = 1f;
 
         [SerializeField]
         private float speadIncrease = 0.01f;
 
         [SerializeField]
         private float timeToSpeadIncrease = 1.0f;
+
+        [SerializeField]
+        private int levelLength = 30;
 
         [SerializeField]
         private PlayerMonoBehaviour playerMonoBehaviour;
@@ -42,7 +46,8 @@ namespace HappyPassengers.Scripts
         [SerializeField]
         private GameObject scorePrefab;
 
-        public float GameSpeed { get { return gameSpeed; } }
+        public float GameSpeed { get { return currentGameSpeed; } }
+        public PlayerModel PlayerModel { get { return playerMonoBehaviour.PlayerModel; } }
 
         public static GameManager Instance
         {
@@ -60,6 +65,7 @@ namespace HappyPassengers.Scripts
 
         private const int speadModificator = 2;
 
+        private float currentGameSpeed = 0;
         private float speadIncreaseLastUpdate = 0;
         private GameObject destinationObj;
         private RectTransform directionTransform;
@@ -67,7 +73,8 @@ namespace HappyPassengers.Scripts
         private GameState gameState = GameState.Start;
         private ISaver saver;
         private Text[] showedScores;
-        public Scores scores;
+        private Scores scores;
+        private float levelTime;
 
         private void Awake()
         {
@@ -93,8 +100,6 @@ namespace HappyPassengers.Scripts
             var directionArrowUi = new UiDirectionArrow(
                 directionTransform,
                 destinationObj.transform,
-                //directionTransform.anchoredPosition + new Vector2(0, Screen.width), 
-                //Mathf.Asin((Screen.width * 0.8f) / diameter),
                 playerMonoBehaviour.PlayerModel,
                 Screen.width,
                 Screen.height / 7);
@@ -137,13 +142,13 @@ namespace HappyPassengers.Scripts
 
         public void SlowDownGameSpeed()// get in obstacle
         {
-            gameSpeed /= speadModificator;
+            currentGameSpeed /= speadModificator;
             speadIncrease /= speadModificator;
         }
 
         public void IncreaseGameSpeed()
         {
-            gameSpeed *= speadModificator;
+            currentGameSpeed *= speadModificator;
             speadIncrease *= speadModificator;
         }
 
@@ -155,30 +160,39 @@ namespace HappyPassengers.Scripts
 
         private void Update()
         {
-            if (gameState == GameState.InGame)
+            switch (gameState)
             {
-                // Speed changes
-                speadIncreaseLastUpdate += Time.deltaTime;
-                if (speadIncreaseLastUpdate >= timeToSpeadIncrease)
-                {
-                    gameSpeed += speadIncrease;
-                    speadIncreaseLastUpdate = 0;
-                }
+                case GameState.Pause:
+                    currentGameSpeed = 0;
+                    break;
+                case GameState.InGame:
+                    // Speed changes
+                    speadIncreaseLastUpdate += Time.deltaTime;
+                    if (speadIncreaseLastUpdate >= timeToSpeadIncrease)
+                    {
+                        currentGameSpeed += speadIncrease;
+                        speadIncreaseLastUpdate = 0;
+                    }
 
-                // Moving objects
-                destinationObj.transform.Translate(0, -(gameSpeed * Time.deltaTime), 0);
+                    // Moving objects
+                    destinationObj.transform.Translate(0, -(currentGameSpeed * Time.deltaTime), 0);
+                    break;
+                case GameState.GameOver:
+                    if (scores == null)
+                    {
+                        scores = new Scores();
+                    }
+                    scores.AddScore(new ScoreModel("New Name", playerMonoBehaviour.PlayerModel.Happiness));
+                    saver.Save(scores);
+                    ShowScore();
+                    Time.timeScale = 0;
+                    break;
             }
-            if (gameState == GameState.GameOver)
-            {
-                if (scores == null)
-                {
-                    scores = new Scores();
-                }
-                scores.AddScore(new ScoreModel("New Name", playerMonoBehaviour.PlayerModel.Happiness));
-                saver.Save(scores);
-                ShowScore();
-                Time.timeScale = 0;
-            }
+        }
+
+        public void PlayGame()
+        {
+            gameState = GameState.InGame;
         }
 
         private Vector3 FindDestinationPoint()

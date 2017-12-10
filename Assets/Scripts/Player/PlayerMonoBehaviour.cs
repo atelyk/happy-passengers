@@ -19,7 +19,7 @@ namespace HappyPassengers.Scripts.Player
         private PlayerModel playerModel;
 
         #region Standart Unity  handlers
-        private void Start()
+        private void Awake()
         {
             anim = GetComponent<Animator>();
             playerModel = new PlayerModel(transform.position, rotationSpeed);

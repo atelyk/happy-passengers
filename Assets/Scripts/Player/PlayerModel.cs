@@ -14,6 +14,20 @@ namespace HappyPassengers.Scripts.Player
         public PlayerModel.Direction Direction { get; set; }
     }
 
+    public class PlayerPositionChangedArgs : EventArgs
+    {
+        public PlayerPositionChangedArgs(Vector3 previousPosition, Vector3 newPosition)
+        {
+            TranslateVector = newPosition - previousPosition;
+            PreviousPosition = previousPosition;
+            NewPosition = newPosition;
+        }
+
+        public Vector3 PreviousPosition { get; set; }
+        public Vector3 NewPosition { get; set; }
+        public Vector3 TranslateVector { get; set; }
+    }
+
     public class PlayerModel
     {
         public enum Direction
@@ -24,6 +38,8 @@ namespace HappyPassengers.Scripts.Player
         }
 
         public event EventHandler<PlayerDirectionChangedArgs> OnPlayerDirectionChanged = (sender, args) => { };
+        public event EventHandler<PlayerPositionChangedArgs> OnPlayerPositionChanged = (sender, args) => { };
+
         public bool IsInObstacle { private set; get; } = false;
 
         public int Happiness
@@ -31,7 +47,15 @@ namespace HappyPassengers.Scripts.Player
             get { return Mathf.RoundToInt(happiness); }
         }
 
-        public Vector3 Position { get { return position; } }
+        public Vector3 Position
+        {
+            get { return position; }
+            private set
+            {
+                OnPlayerPositionChanged(this, new PlayerPositionChangedArgs(position, value));
+                position = value;
+            }
+        }
 
         public PlayerModel(Vector3 startPosition, float rotationSpeed)
         {
@@ -70,11 +94,11 @@ namespace HappyPassengers.Scripts.Player
         {
             if (direction == Direction.Left)
             {
-                position -= new Vector3(rotationSpeed * Time.deltaTime, 0, 0);
+                Position -= new Vector3(rotationSpeed * Time.deltaTime, 0, 0);
             }
             else
             {
-                position += new Vector3(rotationSpeed * Time.deltaTime, 0, 0);
+                Position += new Vector3(rotationSpeed * Time.deltaTime, 0, 0);
             }
 
             if (IsInObstacle)
