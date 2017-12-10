@@ -47,13 +47,20 @@ namespace HappyPassengers.Scripts
         private ObstaclePool[] pools;
         private float distanceToCreateNew = 0;
         private float distanceFromLastObstacle = 0;
-        private Vector3 stageDimensions;
+        private float halfRange;
+        private float generationRangeLeft;
+        private float generationRangeRight;
+        private float generationHight;
 
         void Start ()
         {
             var generatedObjects = GameObject.Find("GeneratedObjects");
 
-            stageDimensions = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, 0));
+            var initialCoord = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height));
+            generationHight = initialCoord.y * 1.1f;
+            halfRange = initialCoord.x * 2;
+            generationRangeLeft = -halfRange;
+            generationRangeRight = halfRange;
 
             pools = new ObstaclePool[obstacles.Length];
             for (var i = 0; i < obstacles.Length; i++)
@@ -68,16 +75,23 @@ namespace HappyPassengers.Scripts
                 distanceFromLastObstacle = 0f;
                 distanceToCreateNew = initialCreationDistance +
                                       Random.Range(0, initialCreationDistance);
-
+                UpdateGenerationRange();
                 var newObstacle = pools[Random.Range(0, pools.Length)]
                     .GetObject(
-                        new Vector3(Random.Range(-stageDimensions.x, stageDimensions.x), stageDimensions.y), 
+                        new Vector3(Random.Range(generationRangeLeft, generationRangeRight), generationHight), 
                         true);
             }
             else
             {
                 distanceFromLastObstacle += GameManager.Instance.GameSpeed * Time.deltaTime;
             }
+        }
+
+        private void UpdateGenerationRange()
+        {
+            generationRangeLeft = GameManager.Instance.PlayerModel.Position.x - halfRange;
+            generationRangeRight = GameManager.Instance.PlayerModel.Position.x + halfRange;
+
         }
     }
 }

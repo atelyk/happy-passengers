@@ -21,10 +21,14 @@ namespace HappyPassengers.Scripts.Player
         #region Standart Unity  handlers
         private void Awake()
         {
-            anim = GetComponent<Animator>();
             playerModel = new PlayerModel(transform.position, rotationSpeed);
-            playerModel.OnPlayerDirectionChanged += OnChangeDirection;
             input = new PlayerInput(playerModel);
+        }
+
+        private void Start()
+        {
+            anim = GetComponent<Animator>();
+            playerModel.OnPlayerDirectionChanged += OnChangeDirection;
         }
 
         private void Update () {

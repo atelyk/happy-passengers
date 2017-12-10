@@ -8,6 +8,9 @@ namespace HappyPassengers.Scripts
         [SerializeField]
         private PlayerMonoBehaviour playerMonoBehaviour;
 
+        [SerializeField]
+        private PlayerModel playerModel;
+
         private void Start()
         {
             playerMonoBehaviour.PlayerModel.OnPlayerPositionChanged += HandlePlayerMove;
