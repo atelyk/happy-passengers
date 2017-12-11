@@ -53,6 +53,18 @@ namespace HappyPassengers.Scripts.Obstacles
             poolFreeIndexes.AddLast(index);
         }
 
+        public void FreeAll()
+        {
+            for (var index = 0; index < pool.Count; index++)
+            {
+                if (pool[index].gameObject.activeSelf)
+                {
+                    pool[index].gameObject.SetActive(false);
+                    poolFreeIndexes.AddLast(index); 
+                }
+            }
+        }
+
         private void CreateInstance(int? index = null)
         {
             var obstacle = GameObject.Instantiate(prototype, parentObject);

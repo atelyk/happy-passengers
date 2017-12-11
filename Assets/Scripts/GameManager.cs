@@ -1,4 +1,5 @@
-﻿using HappyPassengers.Scripts.Player;
+﻿using System.Collections.Generic;
+using HappyPassengers.Scripts.Player;
 using HappyPassengers.Scripts.UI;
 using HappyPassengers.Scripts.UI.Model;
 using UnityEngine;
@@ -12,10 +13,11 @@ namespace HappyPassengers.Scripts
         InGame,
         PlayerActive,
         Pause,
-        GameOver
+        GameOver,
+        Win
     }
 
-    public class GameManager : MonoBehaviour {
+    public partial class GameManager : MonoBehaviour {
         [SerializeField]
         private float initialGameSpeed = 1f;
 
@@ -46,6 +48,19 @@ namespace HappyPassengers.Scripts
         [SerializeField]
         private GameObject scorePrefab;
 
+        [SerializeField]
+        private GameObject onStartUI;
+
+        [SerializeField]
+        private GameObject inGameUI;
+
+        [SerializeField]
+        private GameObject endGameUI;
+
+        [SerializeField]
+        private GameState gameState = GameState.Start;
+        
+
         public float GameSpeed { get { return currentGameSpeed; } }
         public PlayerModel PlayerModel { get { return playerMonoBehaviour.PlayerModel; } }
 
@@ -70,11 +85,14 @@ namespace HappyPassengers.Scripts
         private GameObject destinationObj;
         private RectTransform directionTransform;
         private UiManager uiManager;
-        private GameState gameState = GameState.InGame;
+        private GameState previousGameState;
         private ISaver saver;
-        private Text[] showedScores;
-        private Scores scores;
+        private Text[] shownScores;
+        private Scores savedScores;
         private float levelTime;
+        private Dictionary<GameState, BaseState> statesSet = new Dictionary<GameState, BaseState>();
+        private BaseState currentGameState;
+        private ObstacleManager obstacleManager;
 
         private void Awake()
         {
@@ -93,6 +111,7 @@ namespace HappyPassengers.Scripts
         private void Start()
         {
             playerMonoBehaviour = playerMonoBehaviour ?? GameObject.FindObjectOfType<PlayerMonoBehaviour>();
+            obstacleManager = GetComponent<ObstacleManager>();
             // TODO
             Vector3 destinationPosition = FindDestinationPoint();
             directionTransform = uiDirection.transform as RectTransform;
@@ -108,29 +127,34 @@ namespace HappyPassengers.Scripts
             uiManager = new UiManager(textUiManager, directionArrowUi);
 
             saver = new BinarySaver();
-            scores = saver.Load<Scores>();
-            ShowScore();
+            savedScores = saver.Load<Scores>();
+            ShowScoreBoard();
+
+            FillStates();
+            SetGameState(gameState);
+
+            //TODO: Assert game states - to have all value implemented
         }
 
-        private void ShowScore()
+        private void ShowScoreBoard()
         {
-            if (showedScores == null)
+            if (shownScores == null)
             {
-                showedScores = new Text[scores.scoreSet.Length];
-                for (var i = 0; i < scores.scoreSet.Length; i++)
+                shownScores = new Text[savedScores.scoreSet.Length];
+                for (var i = 0; i < savedScores.scoreSet.Length; i++)
                 {
-                    showedScores[i] = Instantiate(scorePrefab, scorePanel.transform).GetComponent<Text>();
+                    shownScores[i] = Instantiate(scorePrefab, scorePanel.transform).GetComponent<Text>();
                 }
             }
 
-            UpdateScores();
+            UpdateRowsInScoreBoard();
         }
 
-        private void UpdateScores()
+        private void UpdateRowsInScoreBoard()
         {
-            for (var i = 0; i < scores.scoreSet.Length; i++)
+            for (var i = 0; i < savedScores.scoreSet.Length; i++)
             {
-                showedScores[i].text = (i + 1).ToString("D2") + ".    " + scores.scoreSet[i].ToString();
+                shownScores[i].text = (i + 1).ToString("D2") + ".    " + savedScores.scoreSet[i].ToString();
             }
         }
 
@@ -155,44 +179,24 @@ namespace HappyPassengers.Scripts
         public void GameOver()
         {
             print("Game Over");
-            gameState = GameState.GameOver;
-        }
-
-        private void Update()
-        {
-            switch (gameState)
+            if (PlayerModel.Happiness > 0)
             {
-                case GameState.Pause:
-                    currentGameSpeed = 0;
-                    break;
-                case GameState.InGame:
-                    // Speed changes
-                    speadIncreaseLastUpdate += Time.deltaTime;
-                    if (speadIncreaseLastUpdate >= timeToSpeadIncrease)
-                    {
-                        currentGameSpeed += speadIncrease;
-                        speadIncreaseLastUpdate = 0;
-                    }
-
-                    // Moving objects
-                    destinationObj.transform.Translate(0, -(currentGameSpeed * Time.deltaTime), 0);
-                    break;
-                case GameState.GameOver:
-                    if (scores == null)
-                    {
-                        scores = new Scores();
-                    }
-                    scores.AddScore(new ScoreModel("New Name", playerMonoBehaviour.PlayerModel.Happiness));
-                    saver.Save(scores);
-                    ShowScore();
-                    Time.timeScale = 0;
-                    break;
+                SetGameState(GameState.Win);
+            }
+            else
+            {
+                SetGameState(GameState.GameOver);
             }
         }
 
         public void PlayGame()
         {
-            gameState = GameState.InGame;
+            SetGameState(GameState.InGame);
+        }
+
+        private void Update()
+        {
+            currentGameState.Update(this);
         }
 
         private Vector3 FindDestinationPoint()
@@ -201,6 +205,29 @@ namespace HappyPassengers.Scripts
             destinationObj = GameObject.FindGameObjectWithTag("Finish");
             destinationObj.transform.position = destinationObj.transform.position + dest;
             return destinationObj.transform.position;
+        }
+
+        private void SetGameState(GameState newGameState)
+        {
+            previousGameState = gameState;
+            (currentGameState ?? statesSet[gameState]).Exit(this);
+
+            gameState = newGameState;
+            currentGameState = statesSet[gameState];
+            currentGameState.Enter(this);
+        }
+
+        private void FillStates()
+        {
+            AddState(new StartState());
+            AddState(new InGameState());
+            AddState(new GameOverState());
+            AddState(new WinState());
+        }
+
+        private void AddState(BaseState state)
+        {
+            statesSet.Add(state.GameState, state);
         }
     }
 

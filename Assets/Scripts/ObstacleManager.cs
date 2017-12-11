@@ -15,7 +15,6 @@ namespace HappyPassengers.Scripts
         [SerializeField]
         private float initialCreationDistance = 2.5f;
 
-
         private static ObstacleManager _instance;
 
         public static ObstacleManager Instance
@@ -51,8 +50,9 @@ namespace HappyPassengers.Scripts
         private float generationRangeLeft;
         private float generationRangeRight;
         private float generationHight;
+        public bool IsActive = true;
 
-        void Start ()
+        private void Start ()
         {
             var generatedObjects = GameObject.Find("GeneratedObjects");
 
@@ -69,21 +69,33 @@ namespace HappyPassengers.Scripts
             }
         }
 
-        void Update () {
-            if (distanceFromLastObstacle > distanceToCreateNew)
+        private void Update () {
+            if (IsActive)
             {
-                distanceFromLastObstacle = 0f;
-                distanceToCreateNew = initialCreationDistance +
-                                      Random.Range(0, initialCreationDistance);
-                UpdateGenerationRange();
-                var newObstacle = pools[Random.Range(0, pools.Length)]
-                    .GetObject(
-                        new Vector3(Random.Range(generationRangeLeft, generationRangeRight), generationHight), 
-                        true);
+                if (distanceFromLastObstacle > distanceToCreateNew)
+                {
+                    distanceFromLastObstacle = 0f;
+                    distanceToCreateNew = initialCreationDistance +
+                                          Random.Range(0, initialCreationDistance);
+                    UpdateGenerationRange();
+                    //TODO: avoid obstacles overlapping
+                    var newObstacle = pools[Random.Range(0, pools.Length)]
+                        .GetObject(
+                            new Vector3(Random.Range(generationRangeLeft, generationRangeRight), generationHight),
+                            true);
+                }
+                else
+                {
+                    distanceFromLastObstacle += GameManager.Instance.GameSpeed * Time.deltaTime;
+                }
             }
-            else
+        }
+
+        public void Reset()
+        {
+            foreach (var obstaclePool in pools)
             {
-                distanceFromLastObstacle += GameManager.Instance.GameSpeed * Time.deltaTime;
+                obstaclePool.FreeAll();
             }
         }
 

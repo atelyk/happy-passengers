@@ -59,13 +59,25 @@ namespace HappyPassengers.Scripts.Player
 
         public PlayerModel(Vector3 startPosition, float rotationSpeed)
         {
-            this.rotationSpeed = rotationSpeed;
-            this.position = startPosition;
+            this.initialRotationSpeed = rotationSpeed;
+            this.initialPosition = startPosition;
+            Reinit();
         }
 
+        public void Reinit()
+        {
+            rotationSpeed = initialRotationSpeed;
+            position = initialPosition;
+            happiness = initialHappiness;
+            direction = default(Direction);
+        }
+
+        private float initialRotationSpeed;
         private float rotationSpeed;
+        private Vector3 initialPosition;
         private Vector3 position;
         private Direction direction;
+        private float initialHappiness = 100;
         private float happiness = 100;
 
         public void GetOutFromObstacle()
