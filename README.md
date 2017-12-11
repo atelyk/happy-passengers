@@ -10,4 +10,4 @@ It's conceived to be mobile game with swiping input. But for now it's Windows pr
 
 ### Prerequisites
 
-You need to have installed Unity 2017.1.1f
+You need to have installed Unity 2017.2.0f3
