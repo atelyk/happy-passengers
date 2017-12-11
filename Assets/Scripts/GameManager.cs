@@ -70,7 +70,7 @@ namespace HappyPassengers.Scripts
         private GameObject destinationObj;
         private RectTransform directionTransform;
         private UiManager uiManager;
-        private GameState gameState = GameState.Start;
+        private GameState gameState = GameState.InGame;
         private ISaver saver;
         private Text[] showedScores;
         private Scores scores;
