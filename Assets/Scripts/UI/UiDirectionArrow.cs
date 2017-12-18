@@ -39,12 +39,14 @@ namespace HappyPassengers.Scripts.UI
         public void OnGUI()
         {
             // angle to look at the direction
+            var vectorToDestination = destinationTransform.position - playerModel.Position;
             var signedAngle =
-                Vector3.SignedAngle(new Vector3(0, 1), destinationTransform.position - playerModel.Position, Vector3.forward);
+                Vector3.SignedAngle(new Vector3(0, 1), vectorToDestination, Vector3.forward);
 
+            //var devider = vectorToDestination.magnitude < 50 ? 25f : vectorToDestination.magnitude / 2;
             // angle to move on the screen
-            var dirAngle = signedAngle / 45 ;
-            // to not left the screen
+            float dirAngle = signedAngle / 45;
+            // to not leave the screen
             if (Mathf.Abs(dirAngle) > halfAngleForDirectionMove)
             {
                 dirAngle = dirAngle > 0 ? halfAngleForDirectionMove : -halfAngleForDirectionMove;

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using HappyPassengers.Scripts.UI.Screens;
+using UnityEngine;
 
 namespace HappyPassengers.Scripts
 {
@@ -10,21 +11,19 @@ namespace HappyPassengers.Scripts
 
             public override void Enter(GameManager gameManager)
             {
-                gameManager.onStartUI.SetActive(true);
-                gameManager.inGameUI.SetActive(false);
-                gameManager.endGameUI.SetActive(false);
                 gameManager.playerMonoBehaviour.gameObject.SetActive(false);
                 gameManager.obstacleManager.IsActive = false;
+
+                gameManager.ScreenManager.Open(ScreenType.StartScreen);
             }
 
             public override void Update(GameManager gameManager)
             {
-                //TODO
             }
 
             public override void Exit(GameManager gameManager)
             {
-                gameManager.onStartUI.SetActive(false);
+                gameManager.ScreenManager.Close(ScreenType.StartScreen);
             }
         }
     }

@@ -2,6 +2,7 @@
 using HappyPassengers.Scripts.Player;
 using HappyPassengers.Scripts.UI;
 using HappyPassengers.Scripts.UI.Model;
+using HappyPassengers.Scripts.UI.Screens;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +10,7 @@ namespace HappyPassengers.Scripts
 {
     public enum GameState
     {
+        UNDEFINED,
         Start,
         InGame,
         PlayerActive,
@@ -43,26 +45,20 @@ namespace HappyPassengers.Scripts
         private GameObject uiDirection;
 
         [SerializeField]
-        private GameObject scorePanel;
+        private InputField nameInputField;
 
         [SerializeField]
-        private GameObject scorePrefab;
+        private GameState gameStateType = GameState.Start;
 
         [SerializeField]
-        private GameObject onStartUI;
+        private BaseScreen[] screens;
 
-        [SerializeField]
-        private GameObject inGameUI;
-
-        [SerializeField]
-        private GameObject endGameUI;
-
-        [SerializeField]
-        private GameState gameState = GameState.Start;
-        
 
         public float GameSpeed { get { return currentGameSpeed; } }
         public PlayerModel PlayerModel { get { return playerMonoBehaviour.PlayerModel; } }
+        public Scores SavedScores;
+        public float GameTime = 0;
+        public ScreenManager ScreenManager;
 
         public static GameManager Instance
         {
@@ -87,12 +83,11 @@ namespace HappyPassengers.Scripts
         private UiManager uiManager;
         private GameState previousGameState;
         private ISaver saver;
-        private Text[] shownScores;
-        private Scores savedScores;
         private float levelTime;
         private Dictionary<GameState, BaseState> statesSet = new Dictionary<GameState, BaseState>();
         private BaseState currentGameState;
         private ObstacleManager obstacleManager;
+        private GameObject scorePanel;
 
         private void Awake()
         {
@@ -121,47 +116,29 @@ namespace HappyPassengers.Scripts
                 destinationObj.transform,
                 playerMonoBehaviour.PlayerModel,
                 Screen.width,
-                Screen.height / 7);
+                Screen.height / 5);
             var textUiManager = new UiTextManager(playerMonoBehaviour.PlayerModel, uiTimeText, uiHappinessText);
 
             uiManager = new UiManager(textUiManager, directionArrowUi);
+            ScreenManager = new ScreenManager(screens);
 
             saver = new BinarySaver();
-            savedScores = saver.Load<Scores>();
-            ShowScoreBoard();
+            SavedScores = saver.Load<Scores>() ?? new Scores();
 
             FillStates();
-            SetGameState(gameState);
+            SetGameState(gameStateType);
 
             //TODO: Assert game states - to have all value implemented
-        }
-
-        private void ShowScoreBoard()
-        {
-            if (shownScores == null)
-            {
-                shownScores = new Text[savedScores.scoreSet.Length];
-                for (var i = 0; i < savedScores.scoreSet.Length; i++)
-                {
-                    shownScores[i] = Instantiate(scorePrefab, scorePanel.transform).GetComponent<Text>();
-                }
-            }
-
-            UpdateRowsInScoreBoard();
-        }
-
-        private void UpdateRowsInScoreBoard()
-        {
-            for (var i = 0; i < savedScores.scoreSet.Length; i++)
-            {
-                shownScores[i].text = (i + 1).ToString("D2") + ".    " + savedScores.scoreSet[i].ToString();
-            }
+            Debug.Log("End of Start method");
         }
 
 
         private void OnGUI()
         {
-            uiManager.OnGUI();
+            if (gameStateType == GameState.InGame)
+            {
+                uiManager.OnGUI();
+            }
         }
 
         public void SlowDownGameSpeed()// get in obstacle
@@ -176,17 +153,32 @@ namespace HappyPassengers.Scripts
             speadIncrease *= speadModificator;
         }
 
+        public void Exit()
+        {
+            Application.Quit();
+        }
+
         public void GameOver()
         {
             print("Game Over");
-            if (PlayerModel.Happiness > 0)
-            {
-                SetGameState(GameState.Win);
-            }
-            else
-            {
-                SetGameState(GameState.GameOver);
-            }
+            SetGameState(GameState.GameOver);
+        }
+
+        public void Reset()
+        {
+            PlayerModel.Reinit();
+            obstacleManager.Reset();
+            currentGameSpeed = initialGameSpeed;
+            FindDestinationPoint();
+            GameTime = Time.time;
+        }
+
+        public void SaveScore(string name)
+        {
+            SavedScores.AddScore(new ScoreModel(name, PlayerModel.Happiness));
+            saver.Save(SavedScores);
+            ScreenManager.Close(ScreenType.YourScoreScreen);
+            ScreenManager.Open(ScreenType.ScoreboardScreen);
         }
 
         public void PlayGame()
@@ -207,14 +199,15 @@ namespace HappyPassengers.Scripts
             return destinationObj.transform.position;
         }
 
-        private void SetGameState(GameState newGameState)
+        public void SetGameState(GameState newGameStateType)
         {
-            previousGameState = gameState;
-            (currentGameState ?? statesSet[gameState]).Exit(this);
+            previousGameState = gameStateType;
+            (currentGameState ?? statesSet[gameStateType]).Exit(this);
 
-            gameState = newGameState;
-            currentGameState = statesSet[gameState];
+            gameStateType = newGameStateType;
+            currentGameState = statesSet[gameStateType];
             currentGameState.Enter(this);
+            Debug.Log($"New state {newGameStateType} is set");
         }
 
         private void FillStates()
@@ -222,7 +215,6 @@ namespace HappyPassengers.Scripts
             AddState(new StartState());
             AddState(new InGameState());
             AddState(new GameOverState());
-            AddState(new WinState());
         }
 
         private void AddState(BaseState state)

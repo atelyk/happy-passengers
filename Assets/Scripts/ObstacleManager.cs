@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using HappyPassengers.Scripts.Obstacles;
+﻿using HappyPassengers.Scripts.Obstacles;
 using UnityEngine;
 
 namespace HappyPassengers.Scripts
@@ -51,13 +49,14 @@ namespace HappyPassengers.Scripts
         private float generationRangeRight;
         private float generationHight;
         public bool IsActive = true;
+        private GameManager gameManager;
 
         private void Start ()
         {
             var generatedObjects = GameObject.Find("GeneratedObjects");
 
             var initialCoord = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height));
-            generationHight = initialCoord.y * 1.1f;
+            generationHight = initialCoord.y * 1.3f;
             halfRange = initialCoord.x * 2;
             generationRangeLeft = -halfRange;
             generationRangeRight = halfRange;
@@ -67,6 +66,7 @@ namespace HappyPassengers.Scripts
             {
                 pools[i] = new ObstaclePool(obstacles[i], poolCount, generatedObjects.transform);
             }
+            gameManager = GameManager.Instance;
         }
 
         private void Update () {
@@ -86,13 +86,17 @@ namespace HappyPassengers.Scripts
                 }
                 else
                 {
-                    distanceFromLastObstacle += GameManager.Instance.GameSpeed * Time.deltaTime;
+                    distanceFromLastObstacle += gameManager.GameSpeed * Time.deltaTime;
                 }
             }
         }
 
         public void Reset()
         {
+            if (pools == null)
+            {
+                return;
+            }
             foreach (var obstaclePool in pools)
             {
                 obstaclePool.FreeAll();
@@ -101,8 +105,8 @@ namespace HappyPassengers.Scripts
 
         private void UpdateGenerationRange()
         {
-            generationRangeLeft = GameManager.Instance.PlayerModel.Position.x - halfRange;
-            generationRangeRight = GameManager.Instance.PlayerModel.Position.x + halfRange;
+            generationRangeLeft = gameManager.PlayerModel.Position.x - halfRange;
+            generationRangeRight = gameManager.PlayerModel.Position.x + halfRange;
 
         }
     }

@@ -5,23 +5,28 @@ namespace HappyPassengers.Scripts.Obstacles
 {
     public abstract class Obstacle : MonoBehaviour
     {
-        public event Action<Obstacle> OnLeaveScene; 
-        //Position transform;
+        private GameManager gameManager;
 
-        void Awake()
+        public event Action<Obstacle> OnLeaveScene; 
+
+        private void Awake()
         {
-            //transform = GetComponent<Position>();
             OnLeaveScene += o => { };
         }
 
-        void Update()
+        private void Start()
+        {
+            gameManager = GameManager.Instance;
+        }
+
+        private void Update()
         {
             Move();
         }
 
         protected virtual void Move()
         {
-            transform.Translate(0, -(GameManager.Instance.GameSpeed * Time.deltaTime), 0);
+            transform.Translate(0, -(gameManager.GameSpeed * Time.deltaTime), 0);
         }
 
         protected virtual void OnTriggerEnter2D(Collider2D coll)

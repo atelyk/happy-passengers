@@ -8,29 +8,39 @@ namespace HappyPassengers.Scripts.UI
     [Serializable]
     public class Scores : ISavedData
     {
-        private const int topNumber = 10;
+        public const int TopLength = 5;
 
-        public ScoreModel[] scoreSet;
+        public ScoreModel[] ScoreSet { get; private set; }
 
         public void AddScore(ScoreModel score)
         {
-            if (scoreSet == null)
+            if (ScoreSet == null)
             {
-                scoreSet = new ScoreModel[topNumber];
-                scoreSet[0] = score;
+                ScoreSet = new ScoreModel[TopLength];
+                ScoreSet[0] = score;
                 return;
             }
             int i = 0;
-            while (scoreSet[i] != null && scoreSet[i].Score > score.Score)
+            while (ScoreSet[i] != null && ScoreSet[i].Score > score.Score)
             {
                 i++;
             }
-            int j = topNumber - 1;
+            int j = TopLength - 1;
             while (j > i)
             {
-                scoreSet[j] = scoreSet[--j];
+                ScoreSet[j] = ScoreSet[--j];
             }
-            scoreSet[i] = score;
+            ScoreSet[i] = score;
+        }
+
+        public bool IsScoreInTop(int score)
+        {
+            if (ScoreSet == null || ScoreSet[ScoreSet.Length - 1] == null)
+            {
+                return true;
+            }
+            var lastScore = ScoreSet[ScoreSet.Length - 1];
+            return lastScore == null || score > lastScore.Score;
         }
     }
 }

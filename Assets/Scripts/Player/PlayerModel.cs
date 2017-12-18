@@ -67,7 +67,7 @@ namespace HappyPassengers.Scripts.Player
         public void Reinit()
         {
             rotationSpeed = initialRotationSpeed;
-            position = initialPosition;
+            Position = initialPosition;
             happiness = initialHappiness;
             direction = default(Direction);
         }
@@ -79,17 +79,18 @@ namespace HappyPassengers.Scripts.Player
         private Direction direction;
         private float initialHappiness = 100;
         private float happiness = 100;
+        private GameManager gameManager = GameManager.Instance;
 
         public void GetOutFromObstacle()
         {
-            GameManager.Instance.IncreaseGameSpeed();
+            gameManager.IncreaseGameSpeed();
             rotationSpeed *= 2;
             IsInObstacle = false;
         }
 
         public void GetInObstacle()
         {
-            GameManager.Instance.SlowDownGameSpeed();
+            gameManager.SlowDownGameSpeed();
             rotationSpeed /= 2;
             IsInObstacle = true;
             // animation of unhappiness
@@ -118,7 +119,7 @@ namespace HappyPassengers.Scripts.Player
                 happiness -= 5f * Time.deltaTime;
                 if (Happiness < 1)
                 {
-                    GameManager.Instance.GameOver();
+                    gameManager.GameOver();
                 }
             }
         }

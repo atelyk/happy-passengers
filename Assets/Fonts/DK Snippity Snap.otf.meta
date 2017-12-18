@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 41ffd161f8c463f44bd74afdc1843f8b
+timeCreated: 1513343760
+licenseType: Free
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: DK Snippity Snap
+  fontNames:
+  - DK Snippity Snap
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

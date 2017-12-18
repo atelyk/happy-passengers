@@ -1,5 +1,6 @@
 ﻿using HappyPassengers.Scripts.UI;
 using HappyPassengers.Scripts.UI.Model;
+using HappyPassengers.Scripts.UI.Screens;
 using UnityEngine;
 
 namespace HappyPassengers.Scripts
@@ -13,23 +14,25 @@ namespace HappyPassengers.Scripts
             public override void Enter(GameManager gameManager)
             {
                 base.Enter(gameManager);
+                if (gameManager.PlayerModel.Happiness > 0)
+                {
+                    gameManager.ScreenManager.Open(ScreenType.YourScoreScreen);
+                }
+                else
+                {
+                    gameManager.ScreenManager.Open(ScreenType.GameOverScreen);
+                }
             }
 
             public override void Update(GameManager gameManager)
             {
-                //if (gameManager.savedScores == null)
-                //{
-                //    gameManager.savedScores = new Scores();
-                //}
-                //gameManager.savedScores.AddScore(new ScoreModel("New Name", gameManager.playerMonoBehaviour.PlayerModel.Happiness));
-                //gameManager.saver.Save(gameManager.savedScores);
-                //gameManager.ShowScoreBoard();
-                //Time.timeScale = 0;
             }
 
             public override void Exit(GameManager gameManager)
             {
-                gameManager.endGameUI.SetActive(false);
+                gameManager.ScreenManager.Close(ScreenType.GameOverScreen);
+                gameManager.ScreenManager.Close(ScreenType.YourScoreScreen);
+                gameManager.ScreenManager.Close(ScreenType.ScoreboardScreen);
             }
         }
     }

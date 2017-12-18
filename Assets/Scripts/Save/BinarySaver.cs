@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
 using HappyPassengers.Scripts.Save;
 using UnityEngine;
 
@@ -18,10 +13,13 @@ namespace HappyPassengers.Scripts
 
     class BinarySaver: ISaver
     {
+        //"C:/Users/username/AppData/LocalLow/DefaultCompany/HappyPassenger/T.cache"
+
+
         public void Save<T>(T saveData) where T: ISavedData
         {
             BinaryFormatter bf = new BinaryFormatter();
-            using (var fs = new FileStream(Application.persistentDataPath + "/"+ nameof(T) + ".cache", FileMode.Create))
+            using (var fs = new FileStream(Application.persistentDataPath + "/"+ saveData.GetType().Name + ".cache", FileMode.Create))
             {
                 bf.Serialize(fs, saveData);
             }
@@ -30,7 +28,7 @@ namespace HappyPassengers.Scripts
         public T Load<T>() where T : ISavedData
         {
             BinaryFormatter bf = new BinaryFormatter();
-            string filepath = Application.persistentDataPath + "/" + nameof(T) + ".cache";
+            string filepath = Application.persistentDataPath + "/" + typeof(T).Name + ".cache";
             if (File.Exists(filepath))
             {
                 using (var fs = new FileStream(filepath, FileMode.Open))

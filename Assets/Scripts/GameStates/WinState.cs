@@ -1,5 +1,6 @@
 ﻿using HappyPassengers.Scripts.UI;
 using HappyPassengers.Scripts.UI.Model;
+using HappyPassengers.Scripts.UI.Screens;
 using UnityEngine;
 
 namespace HappyPassengers.Scripts
@@ -13,18 +14,15 @@ namespace HappyPassengers.Scripts
             public override void Enter(GameManager gameManager)
             {
                 base.Enter(gameManager);
-                // show input
-            }
-
-            public override void Update(GameManager gameManager)
-            {
-                // handle provided reaction
-                //Time.timeScale = 0;
+                // check if score is in top
+                // show input and score count
+                gameManager.ScreenManager.Open(ScreenType.YourScoreScreen);
             }
 
             public override void Exit(GameManager gameManager)
             {
-                gameManager.endGameUI.SetActive(false);
+                gameManager.ScreenManager.Close(ScreenType.YourScoreScreen);
+
             }
         }
     }

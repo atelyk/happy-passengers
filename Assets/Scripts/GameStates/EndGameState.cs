@@ -1,6 +1,4 @@
-﻿using HappyPassengers.Scripts.UI;
-using HappyPassengers.Scripts.UI.Model;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace HappyPassengers.Scripts
 {
@@ -12,12 +10,8 @@ namespace HappyPassengers.Scripts
 
             public override void Enter(GameManager gameManager)
             {
-                gameManager.onStartUI.SetActive(false);
-                gameManager.inGameUI.SetActive(false);
-                gameManager.endGameUI.SetActive(true);
                 gameManager.playerMonoBehaviour.gameObject.SetActive(false);
                 gameManager.obstacleManager.IsActive = true;
-                gameManager.ShowScoreBoard();
             }
 
             public override void Update(GameManager gameManager)
@@ -27,7 +21,6 @@ namespace HappyPassengers.Scripts
 
             public override void Exit(GameManager gameManager)
             {
-                gameManager.endGameUI.SetActive(false);
             }
         }
     }

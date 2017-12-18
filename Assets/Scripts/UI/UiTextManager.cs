@@ -13,7 +13,7 @@ namespace HappyPassengers.Scripts.UI
         private Text uiTimeText;
         private const float uiUpdateTime = 0.2f;
         private float uiFromLastUpdate = 0;
-        public float gameTime;
+        private float gameTime => GameManager.Instance.GameTime;
 
         private PlayerModel playerModel;
 

@@ -46,6 +46,10 @@ namespace HappyPassengers.Scripts.Player
             {
                 playerModel.GetInObstacle();
             }
+            if (coll.gameObject.tag == "Finish")
+            {
+                GameManager.Instance.GameOver();
+            }
         }
 
         private void OnTriggerExit2D(Collider2D coll)
